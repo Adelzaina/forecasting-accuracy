@@ -53,6 +53,7 @@ def create_features(df):
 # Pre‑compute feature columns (exclude 'load')
 feature_cols = [c for c in test_data.columns if c != 'load']
 
+
 # --- Prediction Function (iterative, uses actual + predicted values) ---
 def make_prediction(input_date, hours_to_predict=24):
     # Create a DataFrame for predictions
@@ -83,8 +84,8 @@ def make_prediction(input_date, hours_to_predict=24):
 
         # Check for NaNs in features; if any, fill them (should not happen if we have enough history)
         if X.isnull().any().any():
-            # Forward fill, then backward fill, then 0
-            X = X.fillna(method='ffill').fillna(method='bfill').fillna(0)
+        # Before
+        X = X.ffill().bfill().fillna(0)
 
         # Scale
         X_scaled = scaler.transform(X)
@@ -180,7 +181,7 @@ if st.sidebar.button("Generate Forecast"):
                 temp_df = create_features(temp_df)
                 X_first = temp_df.loc[[first_forecast_date], feature_cols]
                 # Handle any NaNs (should be rare)
-                X_first = X_first.fillna(method='ffill').fillna(method='bfill').fillna(0)
+                X_first = X_first.ffill().bfill().fillna(0)
                 X_first_scaled = scaler.transform(X_first)
 
                 shap_first = explainer.shap_values(X_first_scaled)
