@@ -113,7 +113,7 @@ prediction_start_date = st.sidebar.date_input(
     "Select Prediction Start Date",
     value=max_date,
     min_value=min_date,
-    max_value=pd.to_datetime('2025-01-01')
+    max_value=max_date
 )
 prediction_start_datetime = pd.to_datetime(prediction_start_date)
 
