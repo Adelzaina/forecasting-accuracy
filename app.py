@@ -53,7 +53,6 @@ def create_features(df):
 # Pre‑compute feature columns (exclude 'load')
 feature_cols = [c for c in test_data.columns if c != 'load']
 
-
 # --- Prediction Function (iterative, uses actual + predicted values) ---
 def make_prediction(input_date, hours_to_predict=24):
     # Create a DataFrame for predictions
@@ -84,7 +83,8 @@ def make_prediction(input_date, hours_to_predict=24):
 
         # Check for NaNs in features; if any, fill them (should not happen if we have enough history)
         if X.isnull().any().any():
-            X = X.ffill().bfill().fillna(0)
+            # Forward fill, then backward fill, then 0
+           X = X.ffill().bfill().fillna(0)
 
         # Scale
         X_scaled = scaler.transform(X)
@@ -113,7 +113,7 @@ prediction_start_date = st.sidebar.date_input(
     "Select Prediction Start Date",
     value=max_date,
     min_value=min_date,
-    max_value=max_date
+    max_value=pd.to_datetime('2025-01-01')
 )
 prediction_start_datetime = pd.to_datetime(prediction_start_date)
 
@@ -127,8 +127,8 @@ if st.sidebar.button("Generate Forecast"):
 
     st.success("Forecast generated!")
 
-    # Display forecast as a table
-    st.dataframe(forecast.rename('Forecasted Load').reset_index().rename(columns={'index': 'Datetime'}), use_container_width=True)
+    # Display forecast as a table - FIXED: use_container_width replaced with width='stretch'
+    st.dataframe(forecast.rename('Forecasted Load').reset_index().rename(columns={'index': 'Datetime'}), width='stretch')
 
     # Plotting the forecast
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -179,7 +179,7 @@ if st.sidebar.button("Generate Forecast"):
                 temp_df.loc[first_forecast_date, 'load'] = test_data['load'].iloc[-1]  # initial guess (will be overwritten later)
                 temp_df = create_features(temp_df)
                 X_first = temp_df.loc[[first_forecast_date], feature_cols]
-                # Handle any NaNs (should be rare)
+                # Handle any NaNs (should be rare) - FIXED: replaced fillna(method=...) with ffill/bfill
                 X_first = X_first.ffill().bfill().fillna(0)
                 X_first_scaled = scaler.transform(X_first)
 
