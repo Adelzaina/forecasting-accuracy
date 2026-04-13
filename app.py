@@ -101,6 +101,7 @@ def make_prediction(input_date, hours_to_predict=24):
 # --- Streamlit UI ---
 st.title("Hourly Energy Consumption Forecast")
 st.write("Forecast future energy consumption based on historical data using an XGBoost model.")
+st.write("By Zainab Iskilu")
 
 # Sidebar for user inputs
 st.sidebar.header("Prediction Settings")
